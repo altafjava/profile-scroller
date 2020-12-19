@@ -1,37 +1,29 @@
-const profiles = [
-  {
-    name: 'Leanne Graham',
-    username: 'Bret',
-    email: 'Sincere@april.biz',
-    address: 'Kulas Light Apt. 556 Gwenborough',
-    zipcode: '92998-3874',
-    phone: '1-770-736-8031 x56442',
-    company: 'Romaguera-Crona',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg',
-  },
-  {
-    name: 'Ervin Howell',
-    username: 'Antonette',
-    email: 'Shanna@melissa.tv',
-    address: 'Victor Plains',
-    zipcode: '90566-7771',
-    phone: '010-692-6593 x09125',
-    company: 'Deckow-Crist',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    name: 'Clementine Bauch',
-    username: 'Samantha',
-    email: 'Nathan@yesenia.net',
-    address: 'Douglas Extension',
-    zipcode: '59590-4157',
-    phone: '1-463-123-4447',
-    company: 'Romaguera-Jacobson',
-    image: 'https://randomuser.me/api/portraits/men/3.jpg',
-  },
-]
-const pi = profileIterator()
-nextProfile()
+async function getUserData() {
+  const response = await fetch('https://jsonplaceholder.typicode.com/users')
+  const users = await response.json()
+  const profiles = []
+  users.forEach((user) => {
+    const address = user.address
+    profiles.push({
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      address: address.street + ' ' + address.suite + ' ' + address.city,
+      zipcode: address.zipcode,
+      phone: user.phone,
+      company: user.company.name,
+      image: `https://randomuser.me/api/portraits/men/${user.id}.jpg`,
+    })
+  })
+  return profiles
+}
+let pi
+getUserData().then((resp) => {
+  pi = profileIterator(resp)
+  nextProfile()
+})
+
 document.getElementById('next').addEventListener('click', nextProfile)
 function nextProfile() {
   const currentProfile = pi.next().value
@@ -54,7 +46,7 @@ function nextProfile() {
     location.reload()
   }
 }
-function profileIterator() {
+function profileIterator(profiles) {
   let nextIndex = 0
   return {
     next: function () {
